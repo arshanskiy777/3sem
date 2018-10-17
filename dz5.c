@@ -43,13 +43,13 @@ int main (int argc, char *argv[]) {
         if (clientID == 0) {
                 fileAdressWrite = name1;
                 fileAdressRead = name2;
-                printf ("%s      %s       Zero client\n\n", fileAdressWrite, fileAdressRead);
+                printf ("Write: %s      Read: %s       Zero client\n\n", fileAdressWrite, fileAdressRead);
 
         } else { //All other numbers - second client
 
                 fileAdressWrite = name2;
                 fileAdressRead = name1;
-                printf ("%s       %s      First client \n\n", fileAdressWrite, fileAdressRead);
+                printf ("Write: %s       Read: %s      First client \n\n", fileAdressWrite, fileAdressRead);
         }
 
         pid_1 = fork();
