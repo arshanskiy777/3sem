@@ -45,7 +45,7 @@ int main (int argc, char *argv[]) {
                 fileAdressRead = name2;
                 printf ("Write: %s      Read: %s       Zero client\n\n", fileAdressWrite, fileAdressRead);
 
-        } else { //All other numbers - second client
+        } else {
 
                 fileAdressWrite = name2;
                 fileAdressRead = name1;
