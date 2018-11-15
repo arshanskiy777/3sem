@@ -1,3 +1,4 @@
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -7,7 +8,7 @@
 #define SIZE 1000
 
 void startWriter (int *fd, char *input, char *fileAdressWrite) {
-        //fd[1] = open (fileAdressWrite, O_WRONLY); 
+        fd[1] = open (fileAdressWrite, O_WRONLY); 
         while(1) {
                 fgets(input, SIZE, stdin);
                 write(fd[1], input, SIZE);
@@ -15,7 +16,7 @@ void startWriter (int *fd, char *input, char *fileAdressWrite) {
 }
 
 void startReader (int *fd, char *output, char *fileAdressRead) {
-       //fd[0] = open (fileAdressRead, O_WRONLY);
+       fd[0] = open (fileAdressRead, O_RDONLY);
         while(1) {
                 read(fd[0], output, SIZE);
                 fprintf(stdout, "%s", output);
@@ -45,13 +46,10 @@ int main (int argc, char *argv[]) {
         }
 
         pid_1 = fork();
-        if (pid_1 == 0) {
-                fd[1] = open (fileAdressWrite, O_WRONLY);
-                startWriter(fd, input, fileAdressWrite);
-        } else if (pid_1 > 0) {
-                fd[0] = open (fileAdressRead, O_RDONLY);
-                startReader(fd, output, fileAdressRead);
-        }
-
+	if (pid_1 == 0) {
+		startWriter(fd, input, fileAdressWrite);
+	} else if (pid_1 > 0) {
+		startReader(fd, output, fileAdressRead);
+	}
         return 0;
 }
