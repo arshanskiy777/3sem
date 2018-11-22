@@ -5,17 +5,20 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/sem.h>
 
+#define CLIENT_NUMBER 2
 #define SV_TYPE 1
 #define SLEEP_TIME 10
 
 int main (/*int argc, char *argv[]*/) {
 	//int id = atoi(argv[1]);
-	int msqid;
+	int msqid, semid;
         char pathname[] = "key.c";
         key_t key;
         int i, len, result;
-
+	struct sembuf A;
+        struct sembuf D;
         struct mymsgbuf{
                 long mytype;
                 struct msinfo{
@@ -28,13 +31,21 @@ int main (/*int argc, char *argv[]*/) {
                 printf("Can\'t generate key.\n");
                 exit(-1);
         }
+	semid = semget(key, 1, 0666 | IPC_CREAT);
+	A.sem_num = 0;
+        A.sem_op = 1;
+        A.sem_flg = 0;
+        D.sem_num = 0;
+        D.sem_op = -1;
+        D.sem_flg = 0;
 	if((msqid = msgget(key, 0666 | IPC_CREAT)) < 0){
 		printf("Can\'t get msqid\n");
 		exit(-1);
 	}
-
+	for (int i = 0; i < CLIENT_NUMBER; i++){
+		semop(semid, &A, 1);
+	}
 	int maxlen = sizeof(struct mymsgbuf) - sizeof(long);
-
 	pid_t pid;
 
 	//Получение данных:
@@ -46,6 +57,7 @@ int main (/*int argc, char *argv[]*/) {
 	       	} else {
 		       	printf ("The message is received.\n");
 	        }
+		semop(semid, &D, 1);
 		pid = fork();
 		if (pid == 0){
 			sleep(SLEEP_TIME);
@@ -61,6 +73,7 @@ int main (/*int argc, char *argv[]*/) {
 	        	} else {
 		        	printf("Message was sent to client with id: %ld\n", mybuf.mytype);
 	        	}
+			semop(semid, &A, 1);
 			exit(0);
 		}
 	}
