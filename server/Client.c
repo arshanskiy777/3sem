@@ -5,19 +5,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/sem.h>
 
 // Запускать программу: ./program <first number to multiplication> <second number to multiplication>
 // Пример: ./Client 4 19
 // Запущенный со значениями 0 и 0 клиент удаляет очередь сообщений
 
 int main(int argc, char *argv[]) {
-	int msqid;
+	int msqid, semid, i, len, maxlen, mult1 = atoi(argv[1]), mult2 = atoi(argv[2]);
 	char pathname[] = "key.c";
 	key_t key;
-	int i, len, maxlen;
-	int mult1 = atoi(argv[1]), mult2 = atoi(argv[2]);
 	long type;
-
 	struct mymsgbuf{
                 long mytype;
                 struct msinfo{
@@ -32,7 +30,7 @@ int main(int argc, char *argv[]) {
 		printf("Can\'t generate key.\n");
 		exit(-1);
 	}
-
+	semid = semget(key, 1, 0666 | IPC_CREAT);
 	if ((msqid = msgget(key, 0666 | IPC_CREAT)) < 0){
 		printf("Can\'t get mesqid\n");
 		exit(-1);
@@ -40,6 +38,7 @@ int main(int argc, char *argv[]) {
 
 	if ((mult1 == 0)&&(mult2 == 0)){
                 msgctl(msqid, IPC_RMID, (struct msqid_ds *) NULL);
+		semctl(semid, 0, IPC_RMID, 0);
                 exit(-1);
         }
 
