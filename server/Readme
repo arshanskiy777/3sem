@@ -1,0 +1,8 @@
+Client:
+Запускать программу: ./program <first number to multiplication> <second number to multiplication>
+Пример: ./Client 4 19
+Запущенный со значениями 0 и 0 клиент удаляет очередь сообщений
+
+
+Server:
+...
